@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
+import Heart from "./common/heart";
 
 class Movies extends Component {
   state = {
@@ -15,14 +16,6 @@ class Movies extends Component {
       </div>
     );
   }
-
-  // handleDecrement = (movie) => {
-  //   let movieFromService = getMovie(movie._id);
-  //   movieFromService.numberInStock > 1
-  //     ? movieFromService.numberInStock--
-  //     : deleteMovie(movie._id);
-  //   this.setState({ movies: getMovies() });
-  // };
 
   handleDelete = (movie) => {
     const movies = this.state.movies.filter((m) => m._id !== movie._id);
@@ -40,10 +33,18 @@ class Movies extends Component {
     return classes;
   };
 
+  handleLike = (movie) => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index] = { ...movie };
+    movies[index].like = !movies[index].like;
+    this.setState({ movies });
+  };
+
   renderMovies = () => {
     if (this.state.movies.length === 0) return;
     return (
-      <table className={"table table-striped table-dark"}>
+      <table className={"table table-striped"}>
         <thead>
           <tr>
             <th>Title</th>
@@ -51,17 +52,28 @@ class Movies extends Component {
             <th>Rate</th>
             <th>Stock</th>
             <th />
+            <th />
           </tr>
         </thead>
         <tbody>
           {this.state.movies.map((movie) => {
-            const { _id, title, genre, dailyRentalRate, numberInStock } = movie;
+            const {
+              _id,
+              title,
+              genre,
+              dailyRentalRate,
+              numberInStock,
+              like,
+            } = movie;
             return (
               <tr key={_id}>
                 <td>{title}</td>
                 <td>{genre.name}</td>
                 <td>{dailyRentalRate}</td>
                 <td>{numberInStock}</td>
+                <td>
+                  <Heart liked={like} onLike={() => this.handleLike(movie)} />
+                </td>
                 <td>
                   <button
                     className={"btn btn-danger btn-sm"}
