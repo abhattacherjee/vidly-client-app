@@ -1,18 +1,30 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
 import Heart from "./common/heart";
+import Pagination from "./common/pagination";
+import { paginate } from "./../utils/paginate";
 
 class Movies extends Component {
   state = {
     movies: getMovies(),
+    pageSize: 4,
+    currentPage: 1,
   };
 
   render() {
+    const { pageSize, currentPage, movies: allMovies } = this.state;
+    const movies = paginate(allMovies, currentPage, pageSize);
     return (
       <div>
         <span className={this.getBadgeClasses()}>{this.renderText()}</span>
         <br />
-        {this.renderMovies()}
+        {this.renderMovies(movies)}
+        <Pagination
+          onPageChange={this.handlePageChange}
+          length={this.state.movies.length}
+          pageSize={pageSize}
+          currentPage={currentPage}
+        />
       </div>
     );
   }
@@ -41,8 +53,13 @@ class Movies extends Component {
     this.setState({ movies });
   };
 
-  renderMovies = () => {
+  handlePageChange = (pageNumber) => {
+    this.setState({ currentPage: pageNumber });
+  };
+
+  renderMovies = (movies) => {
     if (this.state.movies.length === 0) return;
+    console.log(movies);
     return (
       <table className={"table table-striped"}>
         <thead>
@@ -56,7 +73,7 @@ class Movies extends Component {
           </tr>
         </thead>
         <tbody>
-          {this.state.movies.map((movie) => {
+          {movies.map((movie) => {
             const {
               _id,
               title,
