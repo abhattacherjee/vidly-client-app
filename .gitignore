@@ -19,6 +19,7 @@
 .env.production.local
 .idea/
 .prettierrc.json
+package-lock.json
 
 npm-debug.log*
 yarn-debug.log*

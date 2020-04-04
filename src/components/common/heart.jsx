@@ -1,21 +1,9 @@
-import React, { Component } from "react";
+import React from "react";
 import "font-awesome/less/icons.less";
 
-class Heart extends Component {
-  render() {
-    return (
-      <i
-        className={this.getHeartStyle()}
-        style={{ cursor: "pointer" }}
-        onClick={this.props.onLike}
-      />
-    );
-  }
-
-  getHeartStyle = () => {
-    const style = "fa fa-heart";
-    return this.props.liked ? style : style + "-o";
-  };
-}
+const Heart = ({ liked, onLike }) => {
+  let style = "clickable fa fa-heart";
+  return <i className={liked ? style : style + "-o"} onClick={onLike} />;
+};
 
 export default Heart;
