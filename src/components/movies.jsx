@@ -1,41 +1,77 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
+import { getGenres } from "../services/fakeGenreService";
 import Heart from "./common/heart";
 import Pagination from "./common/pagination";
 import { paginate } from "./../utils/paginate";
+import ListGroup from "./common/listGroup";
 
 class Movies extends Component {
   state = {
-    movies: getMovies(),
+    genres: [],
+    movies: [],
     pageSize: 4,
     currentPage: 1,
+    selectedGenre: { _id: "1", name: "All Genres" },
   };
+  componentDidMount() {
+    this.setState({
+      movies: getMovies(),
+      genres: [this.state.selectedGenre, ...getGenres()],
+    });
+  }
 
   render() {
-    const { pageSize, currentPage, movies: allMovies } = this.state;
-    const movies = paginate(allMovies, currentPage, pageSize);
+    const {
+      pageSize,
+      currentPage,
+      movies: allMovies,
+      genres: allGenres,
+      selectedGenre,
+    } = this.state;
+
+    const filteredMovies =
+      selectedGenre._id !== "1"
+        ? allMovies.filter(movie => movie.genre._id === selectedGenre._id)
+        : allMovies;
+
+    const movies = paginate(filteredMovies, currentPage, pageSize);
+
     return (
-      <div>
-        <span className={this.getBadgeClasses()}>{this.renderText()}</span>
-        <br />
-        {this.renderMovies(movies)}
-        <Pagination
-          onPageChange={this.handlePageChange}
-          length={this.state.movies.length}
-          pageSize={pageSize}
-          currentPage={currentPage}
-        />
+      <div className={"container"}>
+        <div className={"row"}>
+          <div className={"col col-6 col-md-2"}>
+            <ListGroup
+              items={allGenres}
+              selectedItem={selectedGenre}
+              onItemSelect={this.handleGenreSelect}
+            />
+          </div>
+          <div className={"col col-md-8"}>
+            <span className={this.getBadgeClasses()}>
+              {this.renderText(filteredMovies)}
+            </span>
+            <br />
+            {this.renderMovies(movies)}
+            <Pagination
+              onPageChange={this.handlePageChange}
+              length={filteredMovies.length}
+              pageSize={pageSize}
+              currentPage={currentPage}
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
-  handleDelete = (movie) => {
-    const movies = this.state.movies.filter((m) => m._id !== movie._id);
+  handleDelete = movie => {
+    const movies = this.state.movies.filter(m => m._id !== movie._id);
     this.setState({ movies });
   };
 
-  renderText = () => {
-    let { length } = this.state.movies;
+  renderText = movies => {
+    let { length } = movies;
     return length === 0 ? "No movies to remove!" : `There are ${length} movies`;
   };
 
@@ -45,7 +81,7 @@ class Movies extends Component {
     return classes;
   };
 
-  handleLike = (movie) => {
+  handleLike = movie => {
     const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
     movies[index] = { ...movie };
@@ -53,13 +89,16 @@ class Movies extends Component {
     this.setState({ movies });
   };
 
-  handlePageChange = (pageNumber) => {
+  handlePageChange = pageNumber => {
     this.setState({ currentPage: pageNumber });
   };
 
-  renderMovies = (movies) => {
+  handleGenreSelect = genre => {
+    this.setState({ selectedGenre: genre, currentPage: 1 });
+  };
+
+  renderMovies = movies => {
     if (this.state.movies.length === 0) return;
-    console.log(movies);
     return (
       <table className={"table table-striped"}>
         <thead>
@@ -73,7 +112,7 @@ class Movies extends Component {
           </tr>
         </thead>
         <tbody>
-          {movies.map((movie) => {
+          {movies.map(movie => {
             const {
               _id,
               title,
@@ -94,8 +133,7 @@ class Movies extends Component {
                 <td>
                   <button
                     className={"btn btn-danger btn-sm"}
-                    onClick={() => this.handleDelete(movie)}
-                  >
+                    onClick={() => this.handleDelete(movie)}>
                     Delete
                   </button>
                 </td>

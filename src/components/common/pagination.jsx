@@ -12,13 +12,12 @@ class Pagination extends Component {
     return (
       <nav>
         <ul className="pagination">
-          {pages.map((p) => {
+          {pages.map(p => {
             return (
               <li className="page-item" key={p}>
                 <button
                   className={this.getPageButtonClasses(p, currentPage)}
-                  onClick={() => onPageChange(p)}
-                >
+                  onClick={() => onPageChange(p)}>
                   {p}
                 </button>
               </li>
