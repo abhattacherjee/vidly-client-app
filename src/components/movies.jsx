@@ -46,7 +46,7 @@ class Movies extends Component {
           </div>
           <div className={"col col-md-8"}>
             <span className={this.getBadgeClasses()}>
-              {this.renderText(movies)}
+              {this.renderText(totalCount)}
             </span>
             <MoviesTable
               movies={movies}
@@ -96,9 +96,8 @@ class Movies extends Component {
     this.setState({ movies });
   };
 
-  renderText = movies => {
-    let { length } = movies;
-    return length === 0 ? "No movies to remove!" : `There are ${length} movies`;
+  renderText = count => {
+    return count === 0 ? "No movies to remove!" : `There are ${count} movies`;
   };
 
   getBadgeClasses = () => {
