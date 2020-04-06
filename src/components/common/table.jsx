@@ -10,5 +10,4 @@ const Table = ({ columns, sortColumn, onSort, data }) => {
     </table>
   );
 };
-
 export default Table;
