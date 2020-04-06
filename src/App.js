@@ -1,11 +1,13 @@
 import React from "react";
-import "./App.css";
+import { Route, Switch, Redirect } from "react-router-dom";
 import Movies from "./components/movies";
 import NavBar from "./components/common/navbar";
-import { Route, Switch } from "react-router-dom";
 import Customers from "./components/customers";
 import Rentals from "./components/rentals";
-import MovieDetails from "./components/movieDetails";
+import MovieForm from "./components/movieForm";
+import NotFound from "./components/common/notFound";
+import "./App.css";
+
 
 function App() {
   const items = [
@@ -15,15 +17,18 @@ function App() {
   ];
 
   const header = { path: "/", label: "Vidly Home" };
+
   return (
     <main className="container>">
       <NavBar items={items} header={header} />
       <Switch>
-        <Route path="/movies/:id" component={MovieDetails}/>
+        <Route path="/movies/:id" component={MovieForm}/>
         <Route path="/movies" component={Movies} />
         <Route path="/customers" component={Customers} />
         <Route path="/rentals" component={Rentals} />
-        <Route path="/" component={Movies} />
+        <Route path="/not-found" component={NotFound} />
+        <Redirect from="/" to="/movies" exact/>
+        <Redirect to="/not-found" />
       </Switch>
     </main>
   );
