@@ -9,6 +9,10 @@ class Form extends Component {
     errors: {},
   };
 
+  /**
+   * Validate entire form
+   * @returns {{errors}|null}
+   */
   validate = () => {
     const { data } = this.state;
     const options = { abortEarly: false };
@@ -21,6 +25,12 @@ class Form extends Component {
     return errors;
   };
 
+  /**
+   * Validate a specific input form
+   * @param name
+   * @param value
+   * @returns {*}
+   */
   validateProperty = ({ name, value }) => {
     const obj = { [name]: value };
     const schema = { [name]: this.schema[name] };

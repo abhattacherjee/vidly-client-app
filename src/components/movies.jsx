@@ -7,20 +7,26 @@ import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
 import LinkButton from "./common/linkButton";
+import SearchBox from "./common/searchBox";
 
 class Movies extends Component {
+  defaultGenre = { _id: "1", name: "All Genres" };
+
   state = {
     genres: [],
     movies: [],
+    searchText: "",
     pageSize: 4,
     currentPage: 1,
-    selectedGenre: { _id: "1", name: "All Genres" },
+    selectedGenre: {},
     sortColumn: { path: "title", order: "asc" },
   };
+
   componentDidMount() {
     this.setState({
       movies: getMovies(),
-      genres: [this.state.selectedGenre, ...getGenres()],
+      genres: [this.defaultGenre, ...getGenres()],
+      selectedGenre: this.defaultGenre,
     });
   }
 
@@ -31,6 +37,7 @@ class Movies extends Component {
       genres: allGenres,
       selectedGenre,
       sortColumn,
+      searchText,
     } = this.state;
 
     const { data: movies, totalCount } = this.getPagedData();
@@ -51,11 +58,17 @@ class Movies extends Component {
                 <LinkButton label="New Movie" path="/movies/new" />
               </div>
               <div className="col col-md-6">
-                <span className={this.getBadgeClasses()}>
+                <span className={this.getBadgeClasses(totalCount)}>
                   {this.renderText(totalCount)}
                 </span>
               </div>
             </div>
+            <SearchBox
+              name="search"
+              label="Search..."
+              value={searchText}
+              onChange={this.handleSearch}
+            />
 
             <MoviesTable
               movies={movies}
@@ -82,12 +95,21 @@ class Movies extends Component {
       movies: allMovies,
       selectedGenre,
       sortColumn,
+      searchText,
     } = this.state;
 
-    const filteredMovies =
-      selectedGenre._id !== "1"
-        ? allMovies.filter(movie => movie.genre._id === selectedGenre._id)
-        : allMovies;
+    let filteredMovies = allMovies;
+
+    // when search text is entered, do not filter movies by genre
+    if (searchText)
+      filteredMovies = allMovies.filter(
+        m => m.title.toLowerCase().search(searchText.toLowerCase()) !== -1
+      );
+    else
+      filteredMovies =
+        selectedGenre._id !== "1"
+          ? allMovies.filter(movie => movie.genre._id === selectedGenre._id)
+          : allMovies;
 
     const sortedMovies = _.orderBy(
       filteredMovies,
@@ -109,9 +131,9 @@ class Movies extends Component {
     return count === 0 ? "No movies to remove!" : `There are ${count} movies`;
   };
 
-  getBadgeClasses = () => {
+  getBadgeClasses = count => {
     let classes = "badge m-2 badge-";
-    classes += this.state.movies.length === 0 ? "warning" : "primary";
+    classes += count === 0 ? "warning" : "primary";
     return classes;
   };
 
@@ -128,11 +150,24 @@ class Movies extends Component {
   };
 
   handleGenreSelect = genre => {
-    this.setState({ selectedGenre: genre, currentPage: 1 });
+    this.setState({
+      selectedGenre: genre,
+      currentPage: 1,
+      searchResults: [],
+      searchText: "",
+    });
   };
 
   handleSort = sortColumn => {
     this.setState({ sortColumn });
+  };
+
+  handleSearch = searchText => {
+    this.setState({
+      searchText,
+      selectedGenre: this.defaultGenre,
+      currentPage: 1,
+    });
   };
 }
 

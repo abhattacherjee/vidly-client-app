@@ -7,8 +7,8 @@ import Customers from "./components/customers";
 import Rentals from "./components/rentals";
 import MovieForm from "./components/movieForm";
 import NotFound from "./components/common/notFound";
-import "./App.css";
 import RegisterForm from "./components/registerForm";
+import "./App.css";
 
 function App() {
   const items = [

@@ -42,16 +42,19 @@ class MovieForm extends Form {
 
   doSubmit = () => {
     // save the movie
-    const { id, title, genreId, numberInStock, rate } = this.state.data;
-    const movie = {
-      _id: id,
-      title: title,
-      genreId: genreId,
-      numberInStock: numberInStock,
-      dailyRentalRate: rate,
-    };
+    const movie = this.viewToDataModel(this.state.data);
     saveMovie(movie);
     this.props.history.replace("/movies");
+  };
+
+  viewToDataModel = movie => {
+    return {
+      _id: movie.id,
+      title: movie.title,
+      genreId: movie.genreId,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.rate,
+    };
   };
 
   render() {
