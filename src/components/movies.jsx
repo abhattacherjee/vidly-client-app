@@ -6,6 +6,7 @@ import { paginate } from "./../utils/paginate";
 import ListGroup from "./common/listGroup";
 import MoviesTable from "./moviesTable";
 import _ from "lodash";
+import LinkButton from "./common/linkButton";
 
 class Movies extends Component {
   state = {
@@ -45,9 +46,17 @@ class Movies extends Component {
             />
           </div>
           <div className={"col col-md-8"}>
-            <span className={this.getBadgeClasses()}>
-              {this.renderText(totalCount)}
-            </span>
+            <div className={"row"}>
+              <div className="col col-md-2" style={{ marginBottom: 20 }}>
+                <LinkButton label="New Movie" path="/movies/new" />
+              </div>
+              <div className="col col-md-6">
+                <span className={this.getBadgeClasses()}>
+                  {this.renderText(totalCount)}
+                </span>
+              </div>
+            </div>
+
             <MoviesTable
               movies={movies}
               onDelete={this.handleDelete}
