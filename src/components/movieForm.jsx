@@ -1,8 +1,9 @@
 import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
-import { getGenres } from "../services/fakeGenreService";
-import { getMovie, saveMovie } from "../services/fakeMovieService";
+import { getGenres } from "../services/genreService";
+import { getMovie, saveMovie } from "../services/movieService";
+import { toast } from "react-toastify";
 
 class MovieForm extends Form {
   state = {
@@ -13,38 +14,57 @@ class MovieForm extends Form {
 
   schema = {
     id: Joi.allow(null),
-    title: Joi.string().required().label("Title"),
+    title: Joi.string().min(5).required().label("Title"),
     genreId: Joi.string().required().label("Genre"),
     numberInStock: Joi.number().min(0).required().label("Number in Stock"),
     rate: Joi.number().min(0).max(10).required().label("Rate"),
   };
 
-  componentDidMount() {
-    const genres = getGenres();
-    this.setState({ genres });
+  async componentDidMount() {
+    await this.populateGenres();
+    await this.populateMovie();
+  }
 
+  populateGenres = async () => {
+    const { data: genres } = await getGenres();
+    this.setState({ genres });
+  };
+
+  populateMovie = async () => {
     const { id: movieId } = this.props.match.params;
     if (movieId === "new") return;
 
-    const movie = getMovie(movieId);
+    try {
+      const { data: movie } = await getMovie(movieId);
 
-    if (!movie) return this.props.history.replace("/not-found");
+      const data = {
+        id: movie._id,
+        title: movie.title,
+        genreId: movie.genre._id,
+        numberInStock: movie.numberInStock,
+        rate: movie.dailyRentalRate,
+      };
+      this.setState({ data });
+    } catch (e) {
+      if (e.response && e.response.status === 404)
+        return this.props.history.replace("/not-found");
+    }
+  };
 
-    const data = {
-      id: movie._id,
-      title: movie.title,
-      genreId: movie.genre._id,
-      numberInStock: movie.numberInStock,
-      rate: movie.dailyRentalRate,
-    };
-    this.setState({ data });
-  }
-
-  doSubmit = () => {
-    // save the movie
-    const movie = this.viewToDataModel(this.state.data);
-    saveMovie(movie);
-    this.props.history.replace("/movies");
+  doSubmit = async () => {
+    try {
+      // save the movie
+      const movie = this.viewToDataModel(this.state.data);
+      await saveMovie(movie);
+      this.props.history.replace("/movies");
+    } catch (e) {
+      if (
+        e.response &&
+        (e.response.status === 400 || e.response.status === 401)
+      ) {
+        toast.error("Unauthorized");
+      }
+    }
   };
 
   viewToDataModel = movie => {
