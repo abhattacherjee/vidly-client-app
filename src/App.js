@@ -8,6 +8,9 @@ import Rentals from "./components/rentals";
 import MovieForm from "./components/movieForm";
 import NotFound from "./components/common/notFound";
 import RegisterForm from "./components/registerForm";
+import {ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import "./App.css";
 
 function App() {
@@ -23,6 +26,7 @@ function App() {
 
   return (
     <main className="container>">
+      <ToastContainer />
       <NavBar items={items} header={header} />
       <Switch>
         <Route path="/login" component={LoginForm}/>
