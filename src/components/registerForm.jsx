@@ -1,30 +1,41 @@
 import React from "react";
 import Form from "./common/form";
 import Joi from "joi-browser";
+import { registerUser } from "../services/userService";
+import { loginWithJwt } from "../services/authService";
 
 class RegisterForm extends Form {
   state = {
-    data: { username: "", password: "", name: "" },
+    data: { email: "", password: "", name: "" },
     errors: {},
   };
 
   // define schema
   schema = {
-    username: Joi.string().email().required().label("Username"),
+    email: Joi.string().email().required().label("Email"),
     password: Joi.string().required().min(5).label("Password"),
-    name: Joi.string().required().label("Name"),
+    name: Joi.string().required().min(5).label("Name"),
   };
 
-  doSubmit = () => {
-    // TODO call the server to register the user
-    console.log("Registering User");
+  doSubmit = async () => {
+    try {
+      const { headers } = await registerUser(this.state.data);
+      loginWithJwt(headers["x-auth-token"]);
+      window.location = "/";
+    } catch (e) {
+      if (e.response && e.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.email = e.response.data;
+        this.setState({ errors });
+      }
+    }
   };
 
   render() {
     return (
       <div className="container m-8">
         <form onSubmit={this.handleSubmit}>
-          {this.renderInput("username", "Username")}
+          {this.renderInput("email", "Email")}
           {this.renderInput("password", "Password", "password")}
           {this.renderInput("name", "Name")}
           {this.renderButton("Register")}

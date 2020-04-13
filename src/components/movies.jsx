@@ -43,6 +43,8 @@ class Movies extends Component {
       searchText,
     } = this.state;
 
+    const { user } = this.props;
+
     const { data: movies, totalCount } = this.getPagedData();
 
     return (
@@ -58,7 +60,7 @@ class Movies extends Component {
           <div className={"col col-md-8"}>
             <div className={"row"}>
               <div className="col col-md-2" style={{ marginBottom: 20 }}>
-                <LinkButton label="New Movie" path="/movies/new" />
+                {user && <LinkButton label="New Movie" path="/movies/new" />}
               </div>
               <div className="col col-md-6">
                 <span className={this.getBadgeClasses(totalCount)}>
@@ -133,10 +135,10 @@ class Movies extends Component {
     try {
       await deleteMovie(movie._id);
     } catch (e) {
-      if (e.response && e.response.status === 404) {
+      if (e.response && e.response.status === 404)
         toast.error("This movie has already been deleted");
-        this.setState({ movies: originalMovies });
-      }
+
+      this.setState({ movies: originalMovies });
     }
   };
 

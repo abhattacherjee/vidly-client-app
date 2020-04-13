@@ -3,6 +3,7 @@ import Form from "./common/form";
 import Joi from "joi-browser";
 import { getGenres } from "../services/genreService";
 import { getMovie, saveMovie } from "../services/movieService";
+import { toast } from "react-toastify";
 
 class MovieForm extends Form {
   state = {
@@ -51,10 +52,19 @@ class MovieForm extends Form {
   };
 
   doSubmit = async () => {
-    // save the movie
-    const movie = this.viewToDataModel(this.state.data);
-    await saveMovie(movie);
-    this.props.history.replace("/movies");
+    try {
+      // save the movie
+      const movie = this.viewToDataModel(this.state.data);
+      await saveMovie(movie);
+      this.props.history.replace("/movies");
+    } catch (e) {
+      if (
+        e.response &&
+        (e.response.status === 400 || e.response.status === 401)
+      ) {
+        toast.error("Unauthorized");
+      }
+    }
   };
 
   viewToDataModel = movie => {
