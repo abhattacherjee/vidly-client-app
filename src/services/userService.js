@@ -1,7 +1,6 @@
 import httpService from "./httpService";
-import { apiEndpoint } from "../config.json";
 
-const endpoint = `${apiEndpoint}/users`;
+const endpoint = "/users";
 
 /**
  * Register a user
